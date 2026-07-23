@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d2b">
+  <title>Code Quest: Maze Hero</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="menuBtn" class="icon-button mobile-only" aria-label="Open levels">☰</button>
+    <div class="brand" aria-label="Code Quest"><span class="brand-dot">●</span> CODE QUEST</div>
+    <div class="top-actions">
+      <div class="progress-pill"><span>★</span><strong id="starCount">0</strong><span id="starTotal">/ 114</span></div>
+      <button id="soundToggle" class="sound-button" type="button" aria-label="Sound on" title="Sound on">🔊</button>
+      <label class="language-control">
+        <span class="sr-only">Language</span>
+        <select id="languageSelect">
+          <option value="kk">Қазақша</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside id="levelPanel" class="level-panel" aria-label="Lessons and missions">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow" data-i18n="course">КУРС</span>
+          <h1 data-i18n="courseTitle">Лабиринт шебері</h1>
+        </div>
+        <button id="closeMenuBtn" class="icon-button mobile-only" aria-label="Close levels">×</button>
+      </div>
+      <button id="skipToLesson5Btn" class="ghost-button skip-lesson-button hidden" type="button">⏭ <span data-i18n="skipToLesson5">Skip to Lesson 5</span></button>
+      <div id="lessonList" class="lesson-list"></div>
+    </aside>
+
+    <section class="game-panel">
+      <div class="game-toolbar">
+        <div class="stat"><span data-i18n="score">Ұпай</span><strong id="scoreValue">0</strong></div>
+        <div class="game-toolbar-center">
+          <div class="lesson-chip" id="lessonChip">1-сабақ</div>
+          <label class="map-control">
+            <span aria-hidden="true">🗺</span><span class="sr-only" data-i18n="mapLabel">Карта</span>
+            <select id="mapSelect" aria-label="Map"></select>
+          </label>
+        </div>
+        <div class="stat right"><span data-i18n="lives">Өмір</span><strong id="livesValue" class="lives">♥ ♥ ♥</strong></div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="gameCanvas" width="640" height="640" aria-label="Maze game"></canvas>
+        <div id="fsmStatus" class="fsm-status hidden" aria-live="polite"></div>
+        <div id="gameOverlay" class="game-overlay hidden">
+          <div class="overlay-card">
+            <div id="overlayIcon" class="overlay-icon">🏆</div>
+            <h2 id="overlayTitle">Жарайсың!</h2>
+            <p id="overlayText"></p>
+            <button id="overlayButton" class="primary-button">OK</button>
+          </div>
+        </div>
+      </div>
+      <div class="game-controls">
+        <div class="dpad" aria-label="Game controls">
+          <button data-direction="UP" aria-label="Up">▲</button>
+          <button data-direction="LEFT" aria-label="Left">◀</button>
+          <button data-direction="DOWN" aria-label="Down">▼</button>
+          <button data-direction="RIGHT" aria-label="Right">▶</button>
+        </div>
+        <div class="game-control-actions">
+          <button id="playGameBtn" class="game-action primary-game-action">▶ <span data-i18n="playGame">Ойнау</span></button>
+          <button id="pauseGameBtn" class="game-action">⏸ <span id="pauseGameLabel" data-i18n="stopGame">Тоқтату</span></button>
+          <button id="restartGameBtn" class="game-action">↻ <span data-i18n="restartGame">Қайта бастау</span></button>
+          <button id="resetPageBtn" class="game-action icon-game-action" data-i18n-title="resetPage" title="Reset page" aria-label="Reset page">⟲</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="mission-panel">
+      <div class="mission-head">
+        <span id="missionNumber" class="eyebrow">МИССИЯ 1 / 4</span>
+        <h2 id="missionTitle">Батырды оят</h2>
+        <div id="conceptBadge" class="concept-badge"></div>
+        <p id="missionInstruction" class="instruction"></p>
+      </div>
+
+      <div id="inputModeBar" class="input-mode-bar" aria-label="Answer input mode">
+        <span data-i18n="inputMethod">Жауап беру тәсілі</span>
+        <div class="mode-buttons">
+          <button id="typingModeBtn" type="button">⌨ <span data-i18n="typingMode">Бірге теру</span></button>
+          <button id="selectModeBtn" type="button">☝ <span data-i18n="selectMode">Таңдау</span></button>
+        </div>
+      </div>
+      <div id="codeCard" class="code-card"></div>
+      <div id="codeToolbox" class="code-toolbox">
+        <div class="toolbox-heading">
+          <strong>🧰 <span data-i18n="toolbox">Код құралдары</span></strong>
+          <span data-i18n="toolboxHelp">Мұнда қолдануға болатын кодтар бар.</span>
+        </div>
+        <div id="toolboxItems" class="toolbox-items"></div>
+      </div>
+      <div id="feedback" class="feedback hidden" role="status" aria-live="polite"></div>
+      <div id="hintBox" class="hint-box hidden"></div>
+
+      <div class="mission-actions">
+        <button id="hintBtn" class="ghost-button">💡 <span data-i18n="hint">Көмек</span> <small id="hintLevel">1/3</small></button>
+        <button id="runBtn" class="primary-button">▶ <span data-i18n="run">Іске қосу</span></button>
+      </div>
+      <button id="nextBtn" class="next-button hidden"><span data-i18n="next">Келесі миссия</span> →</button>
+    </section>
+  </main>
+
+  <dialog id="gateDialog" class="gate-dialog" aria-labelledby="gateTitle">
+    <form id="gateForm" class="gate-card">
+      <div class="gate-icon" aria-hidden="true">🔐</div>
+      <span class="eyebrow">TEACHER ONLY</span>
+      <h2 id="gateTitle" data-i18n="gateTitle">Мұғалім ашады</h2>
+      <p data-i18n="gateText">Келесі тапсырмалар тобын ашу үшін мұғалім 3 таңбалы кодты енгізеді.</p>
+      <strong id="gateDestination" class="gate-destination"></strong>
+      <label class="gate-code-label">
+        <span data-i18n="gateCode">3 таңбалы код</span>
+        <input id="gateCodeInput" type="password" inputmode="numeric" pattern="[0-9]{3}" maxlength="3" autocomplete="off" aria-describedby="gateFeedback" required>
+      </label>
+      <div id="gateFeedback" class="gate-feedback hidden" role="alert"></div>
+      <div class="gate-actions">
+        <button id="gateCancelBtn" type="button" class="ghost-button"><span data-i18n="gateCancel">Бас тарту</span></button>
+        <button type="submit" class="primary-button"><span data-i18n="gateUnlock">Ашу</span></button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
