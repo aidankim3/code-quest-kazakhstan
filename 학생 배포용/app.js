@@ -759,6 +759,17 @@
 
   function attemptHeroMove(direction, now) {
     if (now < game.hero.nextMoveAt) return false;
+    // moveHero() (keydown/tap) calls this directly, outside the game loop's
+    // own per-frame ordering. Without resolving the previous tile's pending
+    // dot here too, a move starting right as the last one finishes can
+    // overwrite hero.x/y before collectDot() ever runs for it, silently
+    // skipping that dot or power dot.
+    updateEntityVisual(game.hero, now);
+    if (game.hero.pendingCollect && !game.hero.moveDuration) {
+      game.hero.pendingCollect = false;
+      collectDot();
+      collectItem(now);
+    }
     const allowed = hasEffect("directions") ? ["UP","DOWN","LEFT","RIGHT"] : hasEffect("right") ? ["RIGHT"] : [];
     if (!allowed.includes(direction)) return false;
     const grid = currentMap().grid;
