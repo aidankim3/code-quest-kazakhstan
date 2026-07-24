@@ -13,14 +13,17 @@
     overlayText: $("overlayText"), overlayButton: $("overlayButton"), levelPanel: $("levelPanel"),
     mapSelect: $("mapSelect"), fsmStatus: $("fsmStatus"), gateDialog: $("gateDialog"),
     gateForm: $("gateForm"), gateCodeInput: $("gateCodeInput"), gateFeedback: $("gateFeedback"),
-    gateDestination: $("gateDestination"), gateCancelBtn: $("gateCancelBtn"), skipToLesson5Btn: $("skipToLesson5Btn")
+    gateDestination: $("gateDestination"), gateCancelBtn: $("gateCancelBtn"), skipToLesson5Btn: $("skipToLesson5Btn"),
+    openMapEditorBtn: $("openMapEditorBtn"), mapEditorDialog: $("mapEditorDialog"), editorTools: $("editorTools"),
+    editorGridEl: $("editorGrid"), editorError: $("editorError"), editorClearBtn: $("editorClearBtn"),
+    editorSaveBtn: $("editorSaveBtn"), editorCloseBtn: $("editorCloseBtn")
   };
   const ctx = els.canvas.getContext("2d");
 
   // Only a salted verification value is distributed to students. This is a
   // classroom pace gate, not cryptographic protection.
   const ACCESS_CODE_HASH = 36869;
-  const defaultProgress = { completed: [], stars: {}, hints: {}, unlocked: ["1-1"], passedGates: [], language: "kk", current: "1-1", heroColor: "YELLOW", typingMode: true, soundEnabled: true, mapId: "classic", savedAt: null };
+  const defaultProgress = { completed: [], stars: {}, hints: {}, unlocked: ["1-1"], passedGates: [], language: "kk", current: "1-1", heroColor: "YELLOW", typingMode: true, soundEnabled: true, mapId: "classic", customMap: null, savedAt: null };
   let progress = loadProgress();
   let currentIndex = Math.max(0, MISSIONS.findIndex(m => m.id === progress.current));
   let selectedAnswer = "";
@@ -40,6 +43,21 @@
   const GHOST_RECAPTURE_GUARD_MS = 700;
   const ITEM_RESPAWN_MIN_MS = 6000;
   const ITEM_RESPAWN_MAX_MS = 11000;
+  const EDITOR_SIZE = 15;
+  const EDITOR_MAX_GHOSTS = 3;
+  const EDITOR_TOOLS = [
+    { key: "WALL", icon: "⬛", labelKey: "editorToolWall" },
+    { key: "DOT", icon: "•", labelKey: "editorToolDot" },
+    { key: "POWER", icon: "⚪", labelKey: "editorToolPower", requiresEffect: "mapEditorPowerDot" },
+    { key: "HERO", icon: "🟡", labelKey: "editorToolHero" },
+    { key: "GHOST", icon: "👻", labelKey: "editorToolGhost" },
+    { key: "ERASE", icon: "␡", labelKey: "editorToolErase" }
+  ];
+  let editorGrid = null;
+  let editorHero = null;
+  let editorGhosts = [];
+  let editorTool = "WALL";
+  let editorPainting = false;
   const ITEM_TYPES = [
     { key: "STEALTH", mechanicEffect: "itemStealthMechanic", durationMs: 5000, color: "#b388ff", icon: "🌫️" },
     { key: "PASS_THROUGH", mechanicEffect: "itemPassThroughMechanic", durationMs: 5000, color: "#4de3ff", icon: "🛡️" },
@@ -80,7 +98,12 @@
   const COLORS = { YELLOW: "#ffd83d", CYAN: "#4de3ff", PINK: "#ff5ea8", GREEN: "#55e28a" };
   let game = freshGame();
 
-  function currentMap() { return MAPS.find(map => map.id === progress.mapId) || MAPS[0]; }
+  function currentMap() {
+    if (progress.mapId === "custom" && progress.customMap) {
+      return { id: "custom", grid: progress.customMap.grid, hero: progress.customMap.hero, ghosts: progress.customMap.ghosts };
+    }
+    return MAPS.find(map => map.id === progress.mapId) || MAPS[0];
+  }
 
   function loadProgress() {
     try {
@@ -305,7 +328,12 @@
     renderMission();
     updateStats();
     updateSkipButton();
+    updateOpenMapEditorButton();
     drawGame(performance.now());
+  }
+
+  function updateOpenMapEditorButton() {
+    els.openMapEditorBtn.classList.toggle("hidden", !hasEffect("mapEditorReachability"));
   }
 
   function updateSkipButton() {
@@ -343,6 +371,10 @@
       const option = document.createElement("option"); option.value = map.id; option.textContent = names[index];
       els.mapSelect.append(option);
     });
+    if (progress.customMap) {
+      const option = document.createElement("option"); option.value = "custom"; option.textContent = t("customMapName");
+      els.mapSelect.append(option);
+    }
     els.mapSelect.value = currentMap().id;
     els.mapSelect.setAttribute("aria-label", t("mapLabel"));
   }
@@ -997,12 +1029,178 @@
     ctx.fillStyle = "#15256d"; [-r*.38,r*.38].forEach(ex => { ctx.beginPath(); ctx.arc(ex+ghost.dx*2,-r*.1+ghost.dy*2,r*.09,0,Math.PI*2); ctx.fill(); }); ctx.restore();
   }
 
+  function isBorderCell(x, y) {
+    return x === 0 || y === 0 || x === EDITOR_SIZE - 1 || y === EDITOR_SIZE - 1;
+  }
+
+  function blankEditorGrid() {
+    const rows = [];
+    for (let y = 0; y < EDITOR_SIZE; y++) {
+      let row = "";
+      for (let x = 0; x < EDITOR_SIZE; x++) row += isBorderCell(x, y) ? "#" : ".";
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function setEditorCell(grid, x, y, char) {
+    const row = grid[y];
+    grid[y] = row.slice(0, x) + char + row.slice(x + 1);
+  }
+
+  function availableEditorTools() {
+    return EDITOR_TOOLS.filter(tool => !tool.requiresEffect || hasEffect(tool.requiresEffect));
+  }
+
+  function openMapEditor() {
+    const saved = progress.customMap;
+    editorGrid = saved ? saved.grid.slice() : blankEditorGrid();
+    editorHero = saved ? { x: saved.hero[0], y: saved.hero[1] } : null;
+    editorGhosts = saved ? saved.ghosts.map(([x, y]) => ({ x, y })) : [];
+    editorTool = "WALL";
+    els.editorError.classList.add("hidden");
+    renderEditorTools();
+    renderEditorGrid();
+    if (typeof els.mapEditorDialog.showModal === "function") els.mapEditorDialog.showModal();
+    else els.mapEditorDialog.setAttribute("open", "");
+  }
+
+  function closeMapEditor() {
+    if (typeof els.mapEditorDialog.close === "function") els.mapEditorDialog.close();
+    else els.mapEditorDialog.removeAttribute("open");
+  }
+
+  function renderEditorTools() {
+    els.editorTools.replaceChildren();
+    availableEditorTools().forEach(tool => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `editor-tool${tool.key === editorTool ? " active" : ""}`;
+      btn.textContent = `${tool.icon} ${t(tool.labelKey)}`;
+      btn.addEventListener("click", () => { editorTool = tool.key; renderEditorTools(); });
+      els.editorTools.append(btn);
+    });
+  }
+
+  function editorCellChar(x, y) {
+    if (editorHero && editorHero.x === x && editorHero.y === y) return "HERO";
+    if (editorGhosts.some(g => g.x === x && g.y === y)) return "GHOST";
+    return editorGrid[y][x];
+  }
+
+  function renderEditorGrid() {
+    els.editorGridEl.replaceChildren();
+    for (let y = 0; y < EDITOR_SIZE; y++) {
+      for (let x = 0; x < EDITOR_SIZE; x++) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.dataset.x = x; cell.dataset.y = y;
+        const border = isBorderCell(x, y);
+        const tile = editorCellChar(x, y);
+        let cls = "editor-cell";
+        if (border) cls += " wall border-tile";
+        else if (tile === "HERO") cls += " hero";
+        else if (tile === "GHOST") cls += " ghost";
+        else if (tile === "#") cls += " wall";
+        else if (tile === "o") cls += " power";
+        else cls += " dot";
+        cell.className = cls;
+        els.editorGridEl.append(cell);
+      }
+    }
+  }
+
+  function applyEditorTool(x, y) {
+    if (isBorderCell(x, y)) return;
+    if (editorTool === "HERO") {
+      editorHero = { x, y };
+      editorGhosts = editorGhosts.filter(g => !(g.x === x && g.y === y));
+    } else if (editorTool === "GHOST") {
+      if (editorHero && editorHero.x === x && editorHero.y === y) return;
+      if (editorGhosts.some(g => g.x === x && g.y === y) || editorGhosts.length >= EDITOR_MAX_GHOSTS) return;
+      editorGhosts.push({ x, y });
+    } else if (editorTool === "ERASE") {
+      if (editorHero && editorHero.x === x && editorHero.y === y) editorHero = null;
+      editorGhosts = editorGhosts.filter(g => !(g.x === x && g.y === y));
+      setEditorCell(editorGrid, x, y, ".");
+    } else {
+      if (editorHero && editorHero.x === x && editorHero.y === y) editorHero = null;
+      editorGhosts = editorGhosts.filter(g => !(g.x === x && g.y === y));
+      setEditorCell(editorGrid, x, y, editorTool === "WALL" ? "#" : editorTool === "POWER" ? "o" : ".");
+    }
+    renderEditorGrid();
+  }
+
+  function reachableFrom(grid, start) {
+    const seen = new Set([`${start.x},${start.y}`]);
+    const queue = [start];
+    for (let index = 0; index < queue.length; index++) {
+      const current = queue[index];
+      for (const move of MOVE_DIRECTIONS) {
+        const x = current.x + move.dx, y = current.y + move.dy, key = `${x},${y}`;
+        if (seen.has(key) || grid[y]?.[x] === "#" || grid[y]?.[x] === undefined) continue;
+        seen.add(key);
+        queue.push({ x, y });
+      }
+    }
+    return seen;
+  }
+
+  function showEditorError(message) {
+    els.editorError.textContent = message;
+    els.editorError.classList.remove("hidden");
+  }
+
+  function saveEditorMap() {
+    els.editorError.classList.add("hidden");
+    if (!editorHero) { showEditorError(t("editorErrorNoHero")); return; }
+    if (!editorGhosts.length) { showEditorError(t("editorErrorNoGhost")); return; }
+    const reachable = reachableFrom(editorGrid, editorHero);
+    const allReachable = editorGhosts.every(g => reachable.has(`${g.x},${g.y}`));
+    if (!allReachable) { showEditorError(t("editorErrorUnreachable")); return; }
+    progress.customMap = {
+      grid: editorGrid.slice(),
+      hero: [editorHero.x, editorHero.y],
+      ghosts: editorGhosts.map(g => [g.x, g.y])
+    };
+    progress.mapId = "custom";
+    saveProgress();
+    closeMapEditor();
+    renderMapSelect();
+    game = freshGame();
+    updateStats(); updateGameButtons(); drawGame(performance.now());
+    els.feedback.classList.remove("hidden", "wrong"); els.feedback.classList.add("correct");
+    els.feedback.textContent = `✓ ${t("editorSaved")}`;
+    sfx("correct");
+  }
+
   els.runBtn.addEventListener("click", checkAnswer);
   els.hintBtn.addEventListener("click", showHint);
   els.nextBtn.addEventListener("click", nextMission);
   els.gateForm.addEventListener("submit", submitGate);
   els.gateCancelBtn.addEventListener("click", closeGate);
   els.skipToLesson5Btn.addEventListener("click", skipToLesson5);
+  els.openMapEditorBtn.addEventListener("click", openMapEditor);
+  els.editorCloseBtn.addEventListener("click", closeMapEditor);
+  els.editorSaveBtn.addEventListener("click", saveEditorMap);
+  els.editorClearBtn.addEventListener("click", () => {
+    editorGrid = blankEditorGrid(); editorHero = null; editorGhosts = [];
+    els.editorError.classList.add("hidden");
+    renderEditorGrid();
+  });
+  els.editorGridEl.addEventListener("pointerdown", event => {
+    const cell = event.target.closest(".editor-cell");
+    if (!cell) return;
+    editorPainting = true;
+    applyEditorTool(Number(cell.dataset.x), Number(cell.dataset.y));
+  });
+  els.editorGridEl.addEventListener("pointerover", event => {
+    if (!editorPainting) return;
+    const cell = event.target.closest(".editor-cell");
+    if (!cell) return;
+    applyEditorTool(Number(cell.dataset.x), Number(cell.dataset.y));
+  });
+  window.addEventListener("pointerup", () => { editorPainting = false; });
   els.gateDialog.addEventListener("cancel", () => { pendingGateIndex = -1; });
   els.gateCodeInput.addEventListener("input", event => { event.target.value = event.target.value.replace(/\D/g, "").slice(0, 3); });
   els.language.addEventListener("change", e => { progress.language=e.target.value; saveProgress(); renderAll(); });

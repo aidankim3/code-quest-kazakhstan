@@ -46,6 +46,7 @@
             <span aria-hidden="true">🗺</span><span class="sr-only" data-i18n="mapLabel">Карта</span>
             <select id="mapSelect" aria-label="Map"></select>
           </label>
+          <button id="openMapEditorBtn" class="icon-button hidden" type="button" data-i18n-title="openMapEditor" title="Map maker" aria-label="Map maker">🖌️</button>
         </div>
         <div class="stat right"><span data-i18n="lives">Өмір</span><strong id="livesValue" class="lives">♥ ♥ ♥</strong></div>
       </div>
@@ -128,6 +129,25 @@
         <button type="submit" class="primary-button"><span data-i18n="gateUnlock">Ашу</span></button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="mapEditorDialog" class="map-editor-dialog" aria-labelledby="editorTitle">
+    <div class="map-editor-card">
+      <div class="editor-header">
+        <div>
+          <span class="eyebrow">MAP EDITOR</span>
+          <h2 id="editorTitle" data-i18n="editorTitle">Design your own map</h2>
+        </div>
+        <button id="editorCloseBtn" type="button" class="icon-button" aria-label="Close">×</button>
+      </div>
+      <div id="editorTools" class="editor-tools"></div>
+      <div id="editorGrid" class="editor-grid" role="grid" aria-label="Map grid"></div>
+      <div id="editorError" class="editor-error hidden" role="alert"></div>
+      <div class="editor-actions">
+        <button id="editorClearBtn" type="button" class="ghost-button"><span data-i18n="editorClear">Clear</span></button>
+        <button id="editorSaveBtn" type="button" class="primary-button"><span data-i18n="editorSave">Save &amp; play</span></button>
+      </div>
+    </div>
   </dialog>
 
   <script src="data.js"></script>

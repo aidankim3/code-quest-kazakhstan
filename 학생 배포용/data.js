@@ -10,10 +10,14 @@ const I18N = {
     inputMethod: "Жауап беру тәсілі", typingMode: "Бірге теру", selectMode: "Таңдау", typingGuide: "Мұғаліммен бірге сары бос орынға тер.", toolbox: "Код құралдары", toolboxHelp: "Қолдануға болатын кодтар. Бұл көмек емес!",
     wrong: "Әлі емес. Таңдауыңды қайта тексер.", selectAnswer: "Жауапты таңда", locked: "Алдыңғы миссияны аяқта.", gateTitle: "Мұғалім ашады", gateText: "Келесі тапсырмалар тобын ашу үшін мұғалім 3 таңбалы кодты енгізеді.", gateCode: "3 таңбалы код", gateUnlock: "Ашу", gateCancel: "Бас тарту", gateWrong: "Код дұрыс емес. Мұғалімнен сұра.", gateNeeded: "Дұрыс! Келесі топты мұғалім ашады.",
     skipToLesson5: "5-сабаққа бірден өту", skipConfirm: "1–4 сабақтар аяқталды деп белгіленіп, 5-сабақтан (Елесті қалпына келтіруді түзету) басталады. Жалғастыру керек пе?",
+    openMapEditor: "Карта жасаушы", editorTitle: "Өз картаңды жаса", editorClear: "Тазалау", editorSave: "Сақтау және ойнау",
+    editorToolWall: "Қабырға", editorToolDot: "Нүкте", editorToolPower: "Үлкен нүкте", editorToolHero: "Батыр", editorToolGhost: "Елес", editorToolErase: "Өшіру",
+    editorErrorNoHero: "Алдымен батырдың бастапқы орнын қой.", editorErrorNoGhost: "Кемінде бір елес қой.", editorErrorUnreachable: "Батыр мен елес(тер) бір-біріне жете алмайды! Батыр мен барлық елес бір-біріне жүріп жете алатындай қабырғаларды қайта орналастыр.",
+    editorSaved: "Карта сақталды! Енді ойнап көр.", customMapName: "Менің картам",
     allDone: "Ойын дайын!", allDoneText: "Сен лабиринт ойынын аяқтадың. Енді өз ойыныңды ойна!",
     gameOver: "Ойын аяқталды", tryAgain: "Қайта көр", win: "Жеңіс!", winText: "Барлық нүктені жинадың!", period: "БӨЛІМ", session: "СЕССИЯ", challenge: "CHALLENGE", soundOn: "Дыбыс қосулы", soundOff: "Дыбыс өшірулі", mapLabel: "Карта", ghostAI: "Елес AI", patrol: "БАРЛАУ", chase: "ҚУУ", frightened: "ҚОРҚУ", eaten: "ҮЙГЕ ОРАЛУ", pathSearch: "BFS ЖОЛ",
     mapNames: ["Классика", "Көпірлер", "Жол айрығы"],
-    lessonNames: ["Қозғалыс және шарттар", "Лабиринт және ұпай", "Елес және соңғы ойын", "FSM және жол іздеу", "Елесті қалпына келтіруді түзету", "Кездейсоқ заттар"]
+    lessonNames: ["Қозғалыс және шарттар", "Лабиринт және ұпай", "Елес және соңғы ойын", "FSM және жол іздеу", "Елесті қалпына келтіруді түзету", "Кездейсоқ заттар", "Өз картаңды жаса"]
   },
   en: {
     course: "COURSE", courseTitle: "Maze Master", teacherTools: "Teacher tools",
@@ -22,10 +26,14 @@ const I18N = {
     inputMethod: "Answer method", typingMode: "Type together", selectMode: "Choose", typingGuide: "Type in the yellow blank with your teacher.", toolbox: "Code toolbox", toolboxHelp: "Codes you may use—not a hint!",
     wrong: "Not yet. Check your choice and try again.", selectAnswer: "Choose an answer", locked: "Finish the previous mission first.", gateTitle: "Teacher unlock", gateText: "Your teacher enters the 3-digit code to open the next mission set.", gateCode: "3-digit code", gateUnlock: "Unlock", gateCancel: "Cancel", gateWrong: "That code is not correct. Ask your teacher.", gateNeeded: "Correct! Your teacher will unlock the next set.",
     skipToLesson5: "Skip to Lesson 5", skipConfirm: "Lessons 1–4 will be marked complete and you'll start Lesson 5 (Fixing the ghost respawn). Continue?",
+    openMapEditor: "Map maker", editorTitle: "Design your own map", editorClear: "Clear", editorSave: "Save & play",
+    editorToolWall: "Wall", editorToolDot: "Dot", editorToolPower: "Power dot", editorToolHero: "Hero", editorToolGhost: "Ghost", editorToolErase: "Erase",
+    editorErrorNoHero: "Place the hero's starting tile first.", editorErrorNoGhost: "Place at least one ghost.", editorErrorUnreachable: "The hero and the ghost(s) cannot reach each other! Rearrange the walls so the hero and every ghost can walk to meet each other.",
+    editorSaved: "Map saved! Try playing it.", customMapName: "My map",
     allDone: "Your game is ready!", allDoneText: "You completed the maze game. Now play your creation!",
     gameOver: "Game over", tryAgain: "Try again", win: "You win!", winText: "You collected every dot!", period: "PERIOD", session: "SESSION", challenge: "CHALLENGE", soundOn: "Sound on", soundOff: "Sound off", mapLabel: "Map", ghostAI: "Ghost AI", patrol: "PATROL", chase: "CHASE", frightened: "FRIGHTENED", eaten: "GOING HOME", pathSearch: "BFS PATH",
     mapNames: ["Classic", "Bridges", "Crossroads"],
-    lessonNames: ["Movement and conditions", "Maze and score", "Ghost and final game", "FSM and path search", "Fixing the ghost respawn", "Random items"]
+    lessonNames: ["Movement and conditions", "Maze and score", "Ghost and final game", "FSM and path search", "Fixing the ghost respawn", "Random items", "Design your own map"]
   },
   ko: {
     course: "과정", courseTitle: "미로 게임 완성하기", teacherTools: "교사용 도구",
@@ -34,10 +42,14 @@ const I18N = {
     inputMethod: "답 입력 방법", typingMode: "함께 타이핑", selectMode: "보기에서 선택", typingGuide: "선생님과 함께 노란 빈칸에 직접 입력하세요.", toolbox: "코드 도구상자", toolboxHelp: "사용 가능한 코드 목록이며 힌트가 아닙니다!",
     wrong: "아직 아니에요. 선택한 답을 다시 확인해 보세요.", selectAnswer: "답 고르기", locked: "앞 미션을 먼저 완료하세요.", gateTitle: "교사 잠금 해제", gateText: "다음 문제 묶음을 열려면 선생님이 3자리 코드를 입력합니다.", gateCode: "3자리 코드", gateUnlock: "잠금 해제", gateCancel: "취소", gateWrong: "비밀번호가 맞지 않습니다.", gateNeeded: "정답입니다! 다음 묶음은 선생님이 열어 주세요.",
     skipToLesson5: "5차시로 바로 건너뛰기", skipConfirm: "1~4차시를 모두 완료 처리하고 5차시(유령 부활 고치기)부터 시작합니다. 계속할까요?",
+    openMapEditor: "맵 만들기", editorTitle: "내 맵 만들기", editorClear: "지우기", editorSave: "저장하고 플레이",
+    editorToolWall: "벽", editorToolDot: "점", editorToolPower: "파워 아이템", editorToolHero: "캐릭터", editorToolGhost: "유령", editorToolErase: "지우개",
+    editorErrorNoHero: "먼저 캐릭터의 시작 위치를 놓아주세요.", editorErrorNoGhost: "유령을 최소 1마리 놓아주세요.", editorErrorUnreachable: "캐릭터와 유령이 서로 만날 수 없어요! 캐릭터와 모든 유령이 서로 걸어서 만날 수 있도록 벽을 다시 배치해 주세요.",
+    editorSaved: "맵이 저장됐어요! 직접 플레이해 보세요.", customMapName: "내가 만든 맵",
     allDone: "게임 완성!", allDoneText: "미로 게임을 모두 완성했습니다. 이제 직접 플레이해 보세요!",
     gameOver: "게임 종료", tryAgain: "다시 하기", win: "성공!", winText: "모든 점을 모았습니다!", period: "교시", session: "세션", challenge: "CHALLENGE", soundOn: "효과음 켜짐", soundOff: "효과음 꺼짐", mapLabel: "맵", ghostAI: "유령 AI", patrol: "순찰", chase: "추적", frightened: "겁먹음", eaten: "복귀 중", pathSearch: "BFS 경로",
     mapNames: ["클래식", "다리", "교차로"],
-    lessonNames: ["움직임과 조건문", "미로와 점수", "유령과 최종 게임", "FSM과 경로 탐색", "유령 부활 고치기", "무작위 아이템"]
+    lessonNames: ["움직임과 조건문", "미로와 점수", "유령과 최종 게임", "FSM과 경로 탐색", "유령 부활 고치기", "무작위 아이템", "내 맵 만들기"]
   }
 };
 
@@ -48,7 +60,8 @@ const CONCEPTS = {
   collision: { kk: "Соқтығыс · Collision", en: "Collision · Соқтығыс", ko: "충돌 · Collision" },
   score: { kk: "Ұпай · Score", en: "Score · Ұпай", ko: "점수 · Score" },
   boolean: { kk: "Ақиқат/Жалған · True/False", en: "True/False · Ақиқат/Жалған", ko: "참/거짓 · True/False" },
-  item: { kk: "Зат · Item", en: "Item · Power-up", ko: "아이템 · Item" }
+  item: { kk: "Зат · Item", en: "Item · Power-up", ko: "아이템 · Item" },
+  map: { kk: "Карта · Map", en: "Map", ko: "맵 · Map" }
 };
 
 const CODE_HELP = {
@@ -98,7 +111,11 @@ const CODE_HELP = {
   "DETECTION": { kk: "Елестің байқауы", en: "Being noticed by a ghost", ko: "유령에게 들킴(감지)" },
   "COLLISION_DAMAGE": { kk: "Соқтығыс зияны", en: "Damage from touching a ghost", ko: "유령과 부딪힌 피해" },
   "SCORE": { kk: "Ұпай", en: "Score", ko: "점수" },
-  "NOTHING": { kk: "Ешнәрсе", en: "Nothing", ko: "아무것도 아님" }
+  "NOTHING": { kk: "Ешнәрсе", en: "Nothing", ko: "아무것도 아님" },
+  "POWER": { kk: "Үлкен нүкте", en: "Power dot", ko: "파워 아이템" },
+  "GHOST": { kk: "Елес", en: "Ghost", ko: "유령" },
+  "show_error()": { kk: "Қате хабарын көрсету", en: "Show an error message", ko: "오류 메시지 보여주기" },
+  "save_map()": { kk: "Картаны сақтау", en: "Save the map", ko: "맵 저장하기" }
 };
 
 const M = (id, originalUnit, title, instruction, concept, code, options, answer, effect, hints, teacher, input = "select") => ({
@@ -167,6 +184,9 @@ const MISSIONS = [
   M("11-9",11,{kk:"Батыр жылдамдығын арттыру",en:"Double the hero's speed",ko:"내 속도 두 배로"},{kk:"Батыр жылдамдығын екі есе арттыратын санды таңда.",en:"Choose the number that doubles the hero's speed.",ko:"캐릭터 속도를 두 배로 만드는 숫자를 고르세요."},"item","if fast_until > now:\n    hero_speed = hero_speed * {{answer}}",["0.5","1","2","10"],"2","itemFastHeroMechanic",[{kk:"Бұл жолы жылдамдық артуы керек.",en:"This time the speed should increase.",ko:"이번엔 속도가 늘어나야 해요."},{kk:"Екі есе — 2.",en:"Double is 2.",ko:"두 배는 2예요."},{kk:"hero_speed * 2",en:"hero_speed * 2",ko:"hero_speed * 2"}],""),
   M("11-10",11,{kk:"Қабырға өту уақыты",en:"Wall-phase duration",ko:"벽 통과 지속시간"},{kk:"Қабырғадан өту затының әсер ету уақытын таңда.",en:"Choose how many seconds the wall-phase item lasts.",ko:"벽 통과 아이템의 지속 시간을 고르세요."},"item","if item == NOCLIP_WALL:\n    noclip_until = now + {{answer}}",["0","3","5","10"],"3","itemNoclipWallDuration",[{kk:"Бұл зат ең қуатты — уақыты қысқа.",en:"This item is the most powerful, so its time is short.",ko:"이 아이템은 가장 강력해서 지속시간이 짧아요."},{kk:"Үш секунд.",en:"Three seconds.",ko:"3초예요."},{kk:"noclip_until = now + 3",en:"noclip_until = now + 3",ko:"noclip_until = now + 3"}],""),
   M("11-11",11,{kk:"Қабырғадан өту",en:"Pass through walls",ko:"벽 통과 가능"},{kk:"Бұл зат кезінде батыр қабырғадан өте ала ма?",en:"Can the hero pass through walls while this item is active?",ko:"이 아이템이 활성화된 동안 캐릭터가 벽을 통과할 수 있을까요?"},"item","if noclip_until > now:\n    can_pass_wall = {{answer}}",["True","False"],"True","itemNoclipWallMechanic",[{kk:"Бұл заттың аты не туралы айтады?",en:"What does this item's name tell you?",ko:"이 아이템 이름이 무엇을 말해주나요?"},{kk:"Өте алса — True.",en:"Can pass means True.",ko:"통과할 수 있으면 True예요."},{kk:"can_pass_wall = True",en:"can_pass_wall = True",ko:"can_pass_wall = True"}],""),
+  M("13-1",13,{kk:"Шекара — әрқашан қабырға",en:"The border is always a wall",ko:"테두리는 항상 벽"},{kk:"Картаның ең сыртқы шеті қандай болу керек?",en:"What should the outermost edge of the map always be?",ko:"맵의 가장 바깥쪽 테두리는 항상 무엇이어야 할까요?"},"map","border_tile = \"{{answer}}\"",["WALL","DOT","POWER","EMPTY"],"WALL","mapEditorBorder",[{kk:"Батыр шектен шығып кетпеуі керек.",en:"The hero must not be able to leave the board.",ko:"캐릭터가 맵 밖으로 나가면 안 돼요."},{kk:"Қабырға — WALL.",en:"A wall is WALL.",ko:"벽은 WALL이에요."},{kk:"border_tile = \"WALL\"",en:"border_tile = \"WALL\"",ko:"border_tile = \"WALL\""}],""),
+  M("13-2",13,{kk:"Кездесу мүмкіндігін тексеру",en:"Check that they can meet",ko:"서로 만날 수 있는지 확인하기"},{kk:"Батыр мен елес бір-біріне жете алмаса, редактор не істеуі керек?",en:"If the hero and a ghost cannot reach each other, what should the editor do?",ko:"캐릭터와 유령이 서로 닿을 수 없다면 에디터는 무엇을 해야 할까요?"},"map","if not reachable(hero_start, ghost_start):\n    {{answer}}",["show_error()","save_map()","hide_dot()","win()"],"show_error()","mapEditorReachability",[{kk:"Мұндай картаны сақтауға болмайды.",en:"A map like that should not be allowed to save.",ko:"그런 맵은 저장되면 안 돼요."},{kk:"Қатені көрсету керек.",en:"An error should be shown.",ko:"오류를 보여줘야 해요."},{kk:"show_error()",en:"show_error()",ko:"show_error()"}],""),
+  M("13-3",13,{kk:"Үлкен нүкте құралы",en:"Power dot tool",ko:"파워 아이템 도구"},{kk:"Редакторда орналастыруға болатын арнайы нүктенің атын таңда.",en:"Choose the name of the special dot you can place in the editor.",ko:"에디터에서 배치할 수 있는 특별한 점의 이름을 고르세요."},"map","tools.append(\"{{answer}}\")",["POWER","WALL","DOT","GHOST"],"POWER","mapEditorPowerDot",[{kk:"Бұл нүкте елесті қорқытады.",en:"This dot frightens the ghosts.",ko:"이 점은 유령을 겁먹게 만들어요."},{kk:"Үлкен нүкте — POWER.",en:"The power dot is POWER.",ko:"파워 아이템은 POWER예요."},{kk:"tools.append(\"POWER\")",en:"tools.append(\"POWER\")",ko:"tools.append(\"POWER\")"}],""),
 ];
 
 MISSIONS.sort((a,b) => Number(a.id.split("-")[0]) - Number(b.id.split("-")[0]) || Number(a.id.split("-")[1]) - Number(b.id.split("-")[1]));
@@ -177,5 +197,6 @@ const LESSON_META = [
   { minutes: "50분 + 휴식 10분 + 50분", note: "1교시는 유령·충돌·생명, 2교시는 최종 규칙과 게임 꾸미기·발표를 진행합니다." },
   { minutes: "50분 + 휴식 10분 + 50분", note: "FSM 상태 전환 4문제와 BFS 경로 탐색 4문제를 연결합니다." },
   { minutes: "50분", note: "유령을 잡은 자리에서 바로 다시 잡혀 점수가 무한히 오르는 버그를 두 가지 방식(무작위 부활, 집으로 복귀)으로 고칩니다." },
-  { minutes: "50분", note: "맵에 무작위로 등장하는 아이템 5종(은신·방어막·둔화·가속·벽 통과)의 지속시간과 효과를 완성합니다. 은신과 방어막을 비교하는 Challenge를 포함합니다." }
+  { minutes: "50분", note: "맵에 무작위로 등장하는 아이템 5종(은신·방어막·둔화·가속·벽 통과)의 지속시간과 효과를 완성합니다. 은신과 방어막을 비교하는 Challenge를 포함합니다." },
+  { minutes: "50분", note: "맵 에디터로 벽·점·파워 아이템·캐릭터/유령 위치를 직접 배치하고, 팩맨과 유령이 서로 만날 수 있는지 자동으로 검사합니다." }
 ];
