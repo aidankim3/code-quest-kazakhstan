@@ -14,6 +14,7 @@
     mapSelect: $("mapSelect"), fsmStatus: $("fsmStatus"), gateDialog: $("gateDialog"),
     gateForm: $("gateForm"), gateCodeInput: $("gateCodeInput"), gateFeedback: $("gateFeedback"),
     gateDestination: $("gateDestination"), gateCancelBtn: $("gateCancelBtn"), skipToLesson5Btn: $("skipToLesson5Btn"),
+    skipToLesson7Btn: $("skipToLesson7Btn"),
     openMapEditorBtn: $("openMapEditorBtn"), mapEditorDialog: $("mapEditorDialog"), editorTools: $("editorTools"),
     editorGridEl: $("editorGrid"), editorError: $("editorError"), editorClearBtn: $("editorClearBtn"),
     editorSaveBtn: $("editorSaveBtn"), editorCloseBtn: $("editorCloseBtn")
@@ -23,6 +24,8 @@
   // Only a salted verification value is distributed to students. This is a
   // classroom pace gate, not cryptographic protection.
   const ACCESS_CODE_HASH = 36869;
+  // Hash of "0723" — gates the lesson-7 skip shortcut the same way.
+  const SKIP_LESSON7_CODE_HASH = 16456;
   const defaultProgress = { completed: [], stars: {}, hints: {}, unlocked: ["1-1"], passedGates: [], language: "kk", current: "1-1", heroColor: "YELLOW", typingMode: true, soundEnabled: true, mapId: "classic", customMap: null, savedAt: null };
   let progress = loadProgress();
   let currentIndex = Math.max(0, MISSIONS.findIndex(m => m.id === progress.current));
@@ -329,6 +332,7 @@
     renderMission();
     updateStats();
     updateSkipButton();
+    updateSkipToLesson7Button();
     updateOpenMapEditorButton();
     drawGame(performance.now());
   }
@@ -343,17 +347,20 @@
     els.skipToLesson5Btn.classList.toggle("hidden", alreadyThere);
   }
 
-  function skipToLesson5() {
-    const targetIndex = MISSIONS.findIndex(m => m.lesson === 5);
-    if (targetIndex <= 0) return;
-    if (!confirm(t("skipConfirm"))) return;
+  function updateSkipToLesson7Button() {
+    const targetIndex = MISSIONS.findIndex(m => m.lesson === 7);
+    const alreadyThere = targetIndex <= 0 || progress.completed.includes(MISSIONS[targetIndex - 1]?.id) || progress.completed.includes(MISSIONS[targetIndex]?.id);
+    els.skipToLesson7Btn.classList.toggle("hidden", alreadyThere);
+  }
+
+  function completeMissionsThrough(targetIndex) {
     MISSIONS.slice(0, targetIndex).forEach(m => {
       if (!progress.completed.includes(m.id)) progress.completed.push(m.id);
       progress.stars[m.id] = 3;
     });
-    for (let unit = 2; unit <= missionUnit(targetIndex); unit++) {
-      const gateId = `unit-${unit}`;
-      if (!progress.passedGates.includes(gateId)) progress.passedGates.push(gateId);
+    for (let i = 1; i <= targetIndex; i++) {
+      const gateId = boundaryGateId(i);
+      if (gateId && !progress.passedGates.includes(gateId)) progress.passedGates.push(gateId);
     }
     const target = MISSIONS[targetIndex];
     if (!progress.unlocked.includes(target.id)) progress.unlocked.push(target.id);
@@ -363,6 +370,23 @@
     saveProgress();
     renderAll();
     els.levelPanel.classList.remove("open");
+  }
+
+  function skipToLesson5() {
+    const targetIndex = MISSIONS.findIndex(m => m.lesson === 5);
+    if (targetIndex <= 0) return;
+    if (!confirm(t("skipConfirm"))) return;
+    completeMissionsThrough(targetIndex);
+  }
+
+  function skipToLesson7() {
+    const targetIndex = MISSIONS.findIndex(m => m.lesson === 7);
+    if (targetIndex <= 0) return;
+    const code = prompt(t("skipLesson7PasswordPrompt"));
+    if (code === null) return;
+    if (accessCodeHash(code.trim()) !== SKIP_LESSON7_CODE_HASH) { alert(t("skipLesson7WrongPassword")); return; }
+    if (!confirm(t("skipConfirm7"))) return;
+    completeMissionsThrough(targetIndex);
   }
 
   function renderMapSelect() {
@@ -1203,6 +1227,7 @@
   els.gateForm.addEventListener("submit", submitGate);
   els.gateCancelBtn.addEventListener("click", closeGate);
   els.skipToLesson5Btn.addEventListener("click", skipToLesson5);
+  els.skipToLesson7Btn.addEventListener("click", skipToLesson7);
   els.openMapEditorBtn.addEventListener("click", openMapEditor);
   els.editorCloseBtn.addEventListener("click", closeMapEditor);
   els.editorSaveBtn.addEventListener("click", saveEditorMap);
