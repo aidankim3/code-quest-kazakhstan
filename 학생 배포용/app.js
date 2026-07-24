@@ -58,6 +58,7 @@
   let editorGhosts = [];
   let editorTool = "WALL";
   let editorPainting = false;
+  let editorCellEls = null;
   const ITEM_TYPES = [
     { key: "STEALTH", mechanicEffect: "itemStealthMechanic", durationMs: 5000, color: "#b388ff", icon: "🌫️" },
     { key: "PASS_THROUGH", mechanicEffect: "itemPassThroughMechanic", durationMs: 5000, color: "#4de3ff", icon: "🛡️" },
@@ -1088,24 +1089,46 @@
     return editorGrid[y][x];
   }
 
+  function classForEditorCell(x, y) {
+    const border = isBorderCell(x, y);
+    const tile = editorCellChar(x, y);
+    let cls = "editor-cell";
+    if (border) cls += " wall border-tile";
+    else if (tile === "HERO") cls += " hero";
+    else if (tile === "GHOST") cls += " ghost";
+    else if (tile === "#") cls += " wall";
+    else if (tile === "o") cls += " power";
+    else cls += " dot";
+    return cls;
+  }
+
+  // Rebuilds the 15x15 grid of cell elements from scratch. Only called when
+  // opening/clearing the editor — repainting during a drag must reuse the
+  // same elements (see refreshEditorGrid) or the browser loses track of
+  // which cell is under the pointer mid-gesture, breaking drag-to-paint.
   function renderEditorGrid() {
     els.editorGridEl.replaceChildren();
+    editorCellEls = [];
     for (let y = 0; y < EDITOR_SIZE; y++) {
+      const row = [];
       for (let x = 0; x < EDITOR_SIZE; x++) {
         const cell = document.createElement("button");
         cell.type = "button";
         cell.dataset.x = x; cell.dataset.y = y;
-        const border = isBorderCell(x, y);
-        const tile = editorCellChar(x, y);
-        let cls = "editor-cell";
-        if (border) cls += " wall border-tile";
-        else if (tile === "HERO") cls += " hero";
-        else if (tile === "GHOST") cls += " ghost";
-        else if (tile === "#") cls += " wall";
-        else if (tile === "o") cls += " power";
-        else cls += " dot";
-        cell.className = cls;
         els.editorGridEl.append(cell);
+        row.push(cell);
+      }
+      editorCellEls.push(row);
+    }
+    refreshEditorGrid();
+  }
+
+  // Updates every cell's visual class in place, without touching the DOM
+  // structure — safe to call on every paint action during a drag.
+  function refreshEditorGrid() {
+    for (let y = 0; y < EDITOR_SIZE; y++) {
+      for (let x = 0; x < EDITOR_SIZE; x++) {
+        editorCellEls[y][x].className = classForEditorCell(x, y);
       }
     }
   }
@@ -1128,7 +1151,7 @@
       editorGhosts = editorGhosts.filter(g => !(g.x === x && g.y === y));
       setEditorCell(editorGrid, x, y, editorTool === "WALL" ? "#" : editorTool === "POWER" ? "o" : ".");
     }
-    renderEditorGrid();
+    refreshEditorGrid();
   }
 
   function reachableFrom(grid, start) {
@@ -1188,19 +1211,27 @@
     els.editorError.classList.add("hidden");
     renderEditorGrid();
   });
+  function paintEditorCellAtPoint(clientX, clientY) {
+    // Touch (and pen) implicitly capture the pointer to the element under the
+    // initial pointerdown, so event.target stays pinned to that first cell
+    // for the whole gesture — hit-testing by coordinate is what actually
+    // finds the cell currently under the finger while dragging.
+    const target = document.elementFromPoint(clientX, clientY);
+    const cell = target && target.closest ? target.closest(".editor-cell") : null;
+    if (!cell || !els.editorGridEl.contains(cell)) return;
+    applyEditorTool(Number(cell.dataset.x), Number(cell.dataset.y));
+  }
   els.editorGridEl.addEventListener("pointerdown", event => {
-    const cell = event.target.closest(".editor-cell");
-    if (!cell) return;
+    event.preventDefault();
     editorPainting = true;
-    applyEditorTool(Number(cell.dataset.x), Number(cell.dataset.y));
+    paintEditorCellAtPoint(event.clientX, event.clientY);
   });
-  els.editorGridEl.addEventListener("pointerover", event => {
+  els.editorGridEl.addEventListener("pointermove", event => {
     if (!editorPainting) return;
-    const cell = event.target.closest(".editor-cell");
-    if (!cell) return;
-    applyEditorTool(Number(cell.dataset.x), Number(cell.dataset.y));
+    paintEditorCellAtPoint(event.clientX, event.clientY);
   });
   window.addEventListener("pointerup", () => { editorPainting = false; });
+  window.addEventListener("pointercancel", () => { editorPainting = false; });
   els.gateDialog.addEventListener("cancel", () => { pendingGateIndex = -1; });
   els.gateCodeInput.addEventListener("input", event => { event.target.value = event.target.value.replace(/\D/g, "").slice(0, 3); });
   els.language.addEventListener("change", e => { progress.language=e.target.value; saveProgress(); renderAll(); });
